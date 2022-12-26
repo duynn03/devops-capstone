@@ -4,6 +4,7 @@ install:
 	chmod +x ./hadolint
 	# Install lint for html
 	pip install html_linter
+	
 lint:
 	./hadolint Dockerfile
 	html_lint.py index.html
