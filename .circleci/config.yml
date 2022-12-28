@@ -2,20 +2,20 @@ version: 2.1
 
 jobs:              
    test-frontend:
-    docker: 
-      - image: python:3.7.3-stretch
-    steps:
-      - checkout # checkout source code from git
-      - run:
-          name: Install dependencies
-          command: |
-            cd HelloWorld
-            make install
-      - run:
-          name: check lint
-          command: |
-            cd HelloWorld
-            make lint
+      docker: 
+         - image: python:3.7.3-stretch
+      steps:
+         - checkout # checkout source code from git
+         - run:
+             name: Install dependencies
+             command: |
+               cd HelloWorld
+               make install
+         - run:
+             name: check lint
+             command: |
+               cd HelloWorld
+               make lint
 
    docker-build:
       docker:
@@ -39,7 +39,22 @@ jobs:
                # push to DockerHub
                docker tag helloworld:${CIRCLE_WORKFLOW_ID:0:7} ${DOCKERHUB_USERNAME}/helloworld:${CIRCLE_WORKFLOW_ID:0:7}
                docker push ${DOCKERHUB_USERNAME}/helloworld:${CIRCLE_WORKFLOW_ID:0:7}
-               
+
+   deploy-infrastructure:
+      docker:
+         - image: amazon/aws-cli
+      working_directory: ~/repo
+      steps:
+         - checkout # checkout source code from git
+         - run:
+            name: Ensure front-end infrastructure exist
+            command: |
+               aws cloudformation deploy \
+               --template-file .circleci/cloudFormations/frontend.yml \
+               --stack-name "helloworld-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+               --tags project=helloworld-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+            
 workflows:
   default:
     jobs:
@@ -49,3 +64,5 @@ workflows:
           filters:
             branches:
               only: [main]
+      - deploy-infrastructure:
+          requires: [docker-build]
