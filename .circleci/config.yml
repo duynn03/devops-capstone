@@ -77,5 +77,5 @@ workflows:
 #              only: [main]
 #      - deploy-infrastructure:
 #          requires: [docker-build]
-      - deploy-frontend:
+      - deploy-frontend
 #          requires: [deploy-infrastructure]
