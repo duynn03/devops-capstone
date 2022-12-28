@@ -68,13 +68,13 @@ jobs:
 workflows:
   default:
     jobs:
-#      - test-frontend
-#      - docker-build:
-#          requires: [test-frontend]
-#          filters:
-#            branches:
-#              only: [main]
-#      - deploy-infrastructure:
-#          requires: [docker-build]
-      - deploy-frontend
-#          requires: [deploy-infrastructure]
+      - test-frontend
+      - docker-build:
+          requires: [test-frontend]
+          filters:
+            branches:
+              only: [main]
+      - deploy-infrastructure:
+          requires: [docker-build]
+      - deploy-frontend:
+          requires: [deploy-infrastructure]
