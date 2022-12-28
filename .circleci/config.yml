@@ -16,8 +16,36 @@ jobs:
           command: |
             cd HelloWorld
             make lint
-                       
+
+   docker-build:
+      docker:
+         - image: cimg/go:1.17
+      working_directory: ~/repo
+      steps:
+         - checkout
+         - setup_remote_docker:
+            version: 20.10.14
+            docker_layer_caching: true
+         - run:
+            name: build and tag docker hub
+            command: |
+               cd HelloWorld
+               # login
+               docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
+               # build image
+               docker build -t helloworld:${CIRCLE_WORKFLOW_ID:0:7} .
+               # list image
+               docker images
+               # push to DockerHub
+               docker tag helloworld:${CIRCLE_WORKFLOW_ID:0:7} ${DOCKERHUB_USERNAME}/helloworld:${CIRCLE_WORKFLOW_ID:0:7}
+               docker push ${DOCKERHUB_USERNAME}/helloworld:${CIRCLE_WORKFLOW_ID:0:7}
+               
 workflows:
   default:
     jobs:
       - test-frontend
+      - docker-build:
+          requires: [test-frontend]
+          filters:
+            branches:
+              only: [master]
