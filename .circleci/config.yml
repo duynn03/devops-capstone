@@ -64,6 +64,26 @@ jobs:
             name: Deploy frontend objects
             command: |
                aws s3 cp ./HelloWorld s3://helloworld-${CIRCLE_WORKFLOW_ID:0:7} --exclude "*" --include "index.html" --recursive
+
+  smoke-test:
+      docker:
+         - image: python:3.7-alpine3.11
+      steps:
+         - checkout # checkout source code from git
+         - run:
+            name: Install dependencies
+            command: |
+              apk --no-cache add curl
+         - run:
+            name: Frontend smoke test.
+            command: |
+              URL="http://helloworld-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-ap-southeast-1.amazonaws.com/"            
+              if curl -s ${URL} | grep "Hello World"
+              then
+                return 0
+              else
+                return 1
+              fi
             
 workflows:
   default:
@@ -77,4 +97,6 @@ workflows:
       - deploy-infrastructure:
           requires: [docker-build]
       - deploy-frontend:
-          requires: [deploy-infrastructure]
+          requires: [deploy-infrastructure]    
+      - smoke-test:
+          requires: [deploy-frontend]
