@@ -1,21 +1,24 @@
 Description: >
-  HelloWorld frontend stack.
+  UdaPeople frontend stack.
 
 Parameters:
-  ID:
-    Description: Unique identifier.
+  WorkflowID:
+    Description: ID of Workflow
     Type: String
 
 Resources:
+
+  ### Create S3 bucket
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "HelloWorld-${ID}"
+      BucketName: !Sub "helloworld-${WorkflowID}"
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
   
+  ### Add policy for S3 bucket
   WebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
