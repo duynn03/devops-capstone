@@ -53,7 +53,7 @@ jobs:
                --template-file .circleci/cloudFormations/frontend.yml \
                --stack-name "helloworld-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
                --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-               --tags project=helloworld-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+               --tags project=helloworld \
 
    deploy-frontend:
       docker:
@@ -84,6 +84,20 @@ jobs:
               else
                 return 1
               fi
+
+   cloudfront-update:
+      docker:
+         - image: amazon/aws-cli
+      steps:
+         - checkout # checkout source code from git
+         - run:
+            name: Update cloudfront distribution
+            command: |
+              aws cloudformation deploy \
+              --template-file .circleci/cloudFormations/cloudfront.yml \
+              --stack-name "helloworld-cloudfront-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=helloworld            
             
 workflows:
   default:
@@ -100,3 +114,5 @@ workflows:
           requires: [deploy-infrastructure]    
       - smoke-test:
           requires: [deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
