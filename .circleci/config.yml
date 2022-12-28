@@ -142,10 +142,9 @@ jobs:
                 then
                   echo "--------------- CLEAN OLD INFRASTRUCTURE ---------------"
                   unset OldWorkflowID
-                  OldWorkflowID=$(echo $stackitem | sed -r 's/udapeople-.*-//g')
+                  OldWorkflowID=$(echo $stackitem | sed -r 's/helloworld-.*-//g')
                   echo "--------------- ${OldWorkflowID} ---------------"
-                  aws s3 rm "s3://helloworld-${OldWorkflowID}" --recursive
-                  aws cloudformation delete-stack --stack-name "helloworld-frontend-${OldWorkflowID}"
+                  
                 else
                   echo "--------------- CANNOT DELETE CURRENT STACK ${stackitem} ---------------"
                 fi
