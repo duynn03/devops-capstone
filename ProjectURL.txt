@@ -1,0 +1,8 @@
+[URL01] GitHub repository
+https://github.com/duynn03/devops-capstone
+
+[URL02]: S3 Bucket
+http://helloworld-c89a848.s3-website-us-east-1.amazonaws.com/
+
+[URL03]: Cloudfront
+https://dh9xas79xegpl.cloudfront.net/
