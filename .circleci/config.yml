@@ -48,4 +48,4 @@ workflows:
           requires: [test-frontend]
           filters:
             branches:
-              only: [master]
+              only: [main]
