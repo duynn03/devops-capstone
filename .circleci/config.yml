@@ -63,18 +63,19 @@ jobs:
          - run:
             name: Deploy frontend objects
             command: |
+               ls
                aws s3 cp HelloWorld/index.html s3://helloworld-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             
 workflows:
   default:
     jobs:
-      - test-frontend
-      - docker-build:
-          requires: [test-frontend]
-          filters:
-            branches:
-              only: [main]
-      - deploy-infrastructure:
-          requires: [docker-build]
+#      - test-frontend
+#      - docker-build:
+#          requires: [test-frontend]
+#          filters:
+#            branches:
+#              only: [main]
+#      - deploy-infrastructure:
+#          requires: [docker-build]
       - deploy-frontend:
-          requires: [deploy-infrastructure]
+#          requires: [deploy-infrastructure]
