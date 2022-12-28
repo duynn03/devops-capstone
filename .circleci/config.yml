@@ -143,6 +143,7 @@ jobs:
                   echo "--------------- CLEAN OLD INFRASTRUCTURE ---------------"
                   unset OldWorkflowID
                   OldWorkflowID=$(echo $stackitem | sed -r 's/udapeople-.*-//g')
+                  echo "--------------- ${OldWorkflowID} ---------------"
                   aws s3 rm "s3://helloworld-${OldWorkflowID}" --recursive
                   aws cloudformation delete-stack --stack-name "helloworld-frontend-${OldWorkflowID}"
                 else
@@ -153,19 +154,19 @@ jobs:
 workflows:
   default:
     jobs:
-      - test-frontend
-      - docker-build:
-          requires: [test-frontend]
-          filters:
-            branches:
-              only: [main]
-      - deploy-infrastructure:
-          requires: [docker-build]
-      - deploy-frontend:
-          requires: [deploy-infrastructure]    
-      - smoke-test:
-          requires: [deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+#      - test-frontend
+#      - docker-build:
+#          requires: [test-frontend]
+#          filters:
+#            branches:
+#              only: [main]
+#      - deploy-infrastructure:
+#          requires: [docker-build]
+#      - deploy-frontend:
+#          requires: [deploy-infrastructure]    
+#      - smoke-test:
+#          requires: [deploy-frontend]
+#      - cloudfront-update:
+#          requires: [smoke-test]
+      - cleanup
+#          requires: [cloudfront-update]
