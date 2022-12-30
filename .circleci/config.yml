@@ -61,15 +61,15 @@ jobs:
          - image: amazon/aws-cli
       steps:
          - checkout # checkout source code from git         
-#         - run:
-#            name: Install tar
-#            command: |
-#              yum -y install tar gzip gettext
+         - run:
+            name: Install tar
+            command: |
+              yum -y install tar gzip gettext
          - run: 
             name: Install dependencies
             command: |
               # Install EKSctl
-              sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+              curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
               mv /tmp/eksctl /usr/local/bin
               eksctl version
          - run:
