@@ -75,15 +75,44 @@ jobs:
               # Wait for deploy success 
               kubectl wait  --for=condition=ready pod -l app=helloworld
               sleep 30s
-         
+
+   smoke-test:
+      docker:
+         - image: amazon/aws-cli
+      steps:
+         - run:
+            name: Install tar
+            command: |
+              yum -y install tar gzip gettext
+         - run: 
+            name: Install Kubectl
+            command: |
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" &&\
+              install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+         - run:
+            name: Frontend smoke test.
+            command: |
+              export hostname=$(kubectl get services helloworld-service  -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+              export url="http://${hostname}:8000"
+              if curl -X GET ${url} | grep -q "Hello World"
+              then
+                echo "Deploy successfully! URL: ${url}"
+              else
+                echo "Deploy fail!. Rollback previous deployment. URL: ${url}"
+                kubectl rollout undo deployment/helloworld-deployment
+                kubectl rollout status deployment helloworld-deployment --timeout=90s
+              fi
+            
 workflows:
   default:
     jobs:
-      - test-frontend
-      - docker-build:
-          requires: [test-frontend]
-          filters:
-            branches:
-              only: [main]
-      - deploy-infrastructure:
-          requires: [docker-build]
+#      - test-frontend
+#      - docker-build:
+#          requires: [test-frontend]
+#          filters:
+#            branches:
+#              only: [main]
+#      - deploy-infrastructure:
+#          requires: [docker-build]
+      - smoke-test
+#          requires: [deploy-infrastructure]

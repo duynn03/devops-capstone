@@ -28,7 +28,7 @@ I set up the following environment variables in My CircleCI project with values:
 * AWS_DEFAULT_REGION: us-east-1
 * DOCKERHUB_USERNAME: dockerhub username
 * DOCKERHUB_PASSWORD: dockerhub password
-(./other/CircleCIEnvironments.png)
+![CircleCIEnvironments](./other/CircleCIEnvironments.png)
 
 ### Folder structure
 * [index.html](./HelloWorld/index.html): the HelloWorld html file 
