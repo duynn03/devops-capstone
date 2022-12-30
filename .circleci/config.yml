@@ -65,7 +65,7 @@ jobs:
               cd .circleci/cloudFormations/EKS
               chmod +x create_cluster.sh
               ./create_cluster.sh
-        - run:
+         - run:
             name: Deploy app
             command: |
               cd .circleci/deployApp
