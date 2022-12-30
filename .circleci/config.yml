@@ -75,12 +75,34 @@ jobs:
               # Wait for deploy success 
               kubectl wait  --for=condition=ready pod -l app=helloworld
               sleep 30s
+
+   smoke-test:
+      docker:
+         - image: amazon/aws-cli
+      steps:
          - run:
-            name: Smock test
+            name: Install tar
             command: |
+              yum -y install tar gzip gettext
+         - run: 
+            name: Install Kubectl
+            command: |
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" &&\
+              install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+         - run: 
+            name: Install EKSctl
+            command: |
+              curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+              mv /tmp/eksctl /usr/local/bin
+         - run:
+            name: Frontend smoke test.
+            command: |
+              # Integrate kubectl with aws eks
+              aws eks update-kubeconfig --region us-east-1 --name helloworld-cluster
+              export KUBECONFIG=~/.kube/config
               # get URL
               export hostname=$(kubectl get services helloworld-service  -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-              export url="http://${hostname}:8000"
+              export url="http://${hostname}:8080"
               # test
               if curl -X GET ${url} | grep -q "Hello World"
               then
@@ -90,15 +112,17 @@ jobs:
                 kubectl rollout undo deployment/helloworld-deployment
                 kubectl rollout status deployment helloworld-deployment --timeout=90s
               fi
-      
+            
 workflows:
   default:
     jobs:
-      - test-frontend
-      - docker-build:
-          requires: [test-frontend]
-          filters:
-            branches:
-              only: [main]
-      - deploy-infrastructure:
-          requires: [docker-build]
+#      - test-frontend
+#      - docker-build:
+#          requires: [test-frontend]
+#          filters:
+#            branches:
+#              only: [main]
+#      - deploy-infrastructure:
+#          requires: [docker-build]
+      - smoke-test
+#          requires: [deploy-infrastructure]
