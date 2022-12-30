@@ -78,7 +78,6 @@ jobs:
          - run:
             name: Create cluster
             command: |
-              ls
               cd .circleci/cloudFormations/EKS
               chmod +x create_cluster.sh
               ./create_cluster.sh
